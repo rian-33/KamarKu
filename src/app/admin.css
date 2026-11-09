@@ -1,0 +1,21 @@
+.admin-manage{border-top:1px solid var(--neutral-200);padding-top:15px;margin:28px 0}
+.admin-manage h3{font-family:'Playfair Display',serif;color:var(--primary-900);font-weight:500;font-size:22px}
+.admin-simple-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--neutral-200);padding:10px 0;font-size:12px}
+.admin-simple-row>button{border:1px solid var(--neutral-200);background:#fff;color:var(--error);padding:6px 10px;font-size:10px}
+.admin-simple-row>button:disabled{opacity:.4;cursor:default}
+.admin-schedules{padding:5px 0 35px}
+.toast{z-index:90}
+.admin-schedules h3{font-family:'Playfair Display',serif;color:var(--primary-900);font-weight:500;font-size:22px}
+.schedule-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:end;border-top:1px solid var(--neutral-200);padding:14px 0}
+.schedule-row>b{padding-bottom:10px;color:var(--primary-700);font-size:13px}
+.room-editor{padding:5px 0 35px}
+.room-editor h3{font-family:'Playfair Display',serif;color:var(--primary-900);font-weight:500;font-size:22px}
+.room-editor-row{display:grid;grid-template-columns:1.5fr 1fr .7fr .8fr;gap:12px;align-items:end;border-top:1px solid var(--neutral-200);padding:15px 0}
+.room-editor-row .room-description{grid-column:1/4}
+.room-editor-row .room-image-field{grid-column:1/-1}
+.facility-editor{padding:5px 0 40px}
+.facility-editor h3{font-family:'Playfair Display',serif;color:var(--primary-900);font-weight:500;font-size:22px}
+.facility-editor-row{display:grid;grid-template-columns:1fr 1fr 2fr 2fr auto;gap:10px;align-items:end;border-top:1px solid var(--neutral-200);padding:13px 0}
+.facility-editor-row .button{padding:10px;font-size:11px}
+@media(max-width:900px){.facility-editor-row{grid-template-columns:1fr 1fr}.facility-editor-row .button{grid-column:1/-1}}
+@media(max-width:620px){.schedule-row{grid-template-columns:1fr 1fr}.schedule-row>b{grid-column:1/-1}.schedule-row .button{grid-column:1/-1}.room-editor-row{grid-template-columns:1fr 1fr}.room-editor-row .room-description,.room-editor-row .room-image-field{grid-column:1/-1}.room-editor-row .booking-actions{grid-column:1/-1}.facility-editor-row{grid-template-columns:1fr}.facility-editor-row .button{grid-column:auto}}

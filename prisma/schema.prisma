@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(GUEST)
+  bookings  Booking[]
+}
+
+enum Role {
+  GUEST
+  ADMIN
+}
+
+model RoomType {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String?
+  pricePerNight Decimal
+  capacity      Int
+  imageUrl      String?
+  rooms         Room[]
+  bookings      Booking[]
+}
+
+model Room {
+  id         Int        @id @default(autoincrement())
+  roomTypeId Int
+  roomNumber String     @unique
+  status     RoomStatus @default(AVAILABLE)
+  roomType   RoomType   @relation(fields: [roomTypeId], references: [id])
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+model Facility {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String?
+  category    String
+  imageUrl    String?
+}
+
+model MealSchedule {
+  id        Int        @id @default(autoincrement())
+  mealType  MealType
+  startTime DateTime   @db.Time
+  endTime   DateTime   @db.Time
+  menus     MealMenu[]
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+model MealMenu {
+  id             Int          @id @default(autoincrement())
+  mealScheduleId Int
+  menuDate       DateTime     @db.Date
+  dishName       String
+  category       String
+  mealSchedule   MealSchedule @relation(fields: [mealScheduleId], references: [id])
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  bookingCode String        @unique
+  userId      Int
+  roomTypeId  Int
+  checkIn     DateTime      @db.Date
+  checkOut    DateTime      @db.Date
+  totalGuests Int
+  totalPrice  Decimal
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  user        User          @relation(fields: [userId], references: [id])
+  roomType    RoomType      @relation(fields: [roomTypeId], references: [id])
+  @@index([roomTypeId, checkIn, checkOut])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+

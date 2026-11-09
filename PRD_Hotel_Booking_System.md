@@ -39,7 +39,6 @@ Calon tamu hotel mengalami **kesulitan besar** dalam tiga hal berikut sebelum da
 | G5 | Admin hotel dapat **mengelola seluruh data** (kamar, fasilitas, jadwal makan, booking) | Admin tidak perlu mengubah data melalui database langsung |
 
 **Non-Goals (di luar cakupan versi ini):**
-- Pembayaran online/gateway pembayaran
 - Integrasi channel manager (OTA seperti Traveloka, Booking.com)
 - Aplikasi mobile native
 - Program loyalitas tamu
@@ -72,8 +71,9 @@ Calon tamu hotel mengalami **kesulitan besar** dalam tiga hal berikut sebelum da
 | US-02 | Sebagai tamu, saya ingin melihat detail kamar (foto, harga, kapasitas, fasilitas kamar) | Must Have | - Setiap tipe kamar menampilkan harga per malam, kapasitas tamu, dan fasilitas di dalam kamar |
 | US-03 | Sebagai tamu, saya ingin melihat daftar fasilitas hotel beserta deskripsi dan foto | Must Have | - Halaman fasilitas menampilkan seluruh fasilitas yang dikelola admin <br>- Setiap fasilitas punya nama, kategori, deskripsi, dan gambar |
 | US-04 | Sebagai tamu, saya ingin melihat jam makan (pagi/siang/malam) dan lauk/menu apa saja yang disajikan pada tiap waktu makan | Must Have | - Sistem menampilkan jadwal waktu makan (jam mulai–selesai) <br>- Sistem menampilkan menu/lauk per waktu makan berdasarkan tanggal yang dipilih <br>- Menu dapat berbeda setiap hari |
-| US-05 | Sebagai tamu, saya ingin membooking kamar dengan mengisi data diri dan memilih tanggal | Must Have | - Sistem validasi ketersediaan ulang sebelum menyimpan <br>- Booking berhasil tersimpan dengan **kode booking unik** <br>- Total harga dihitung otomatis: harga per malam × jumlah malam |
-| US-06 | Sebagai tamu, saya ingin mengecek status booking saya menggunakan kode booking | Must Have | - Tamu dapat mencari booking berdasarkan kode booking <br>- Status booking ditampilkan: pending / confirmed / cancelled / completed |
+| US-05 | Sebagai tamu, saya ingin mengisi identitas, membayar, lalu menerima kode booking | Must Have | - Nama, email, nomor KTP, dan foto KTP wajib divalidasi <br>- Sistem memvalidasi ketersediaan ulang dan membuat transaksi Midtrans <br>- Booking belum terkonfirmasi sebelum notifikasi pembayaran tervalidasi <br>- Total harga dihitung otomatis: harga per malam × jumlah malam |
+| US-06 | Sebagai tamu, saya ingin mengecek status booking saya menggunakan kode booking | Must Have | - Tamu dapat mencari booking berdasarkan kode booking <br>- Status pembayaran dan booking ditampilkan tanpa membocorkan data KTP |
+| US-13 | Sebagai tamu, saya ingin membatalkan booking sebelum batas kebijakan | Must Have | - Pembatalan tersedia sampai 2 jam sebelum check-in <br>- Sistem menangani pembatalan/refund sesuai status pembayaran Midtrans <br>- Booking yang melewati batas tidak dapat dibatalkan dari website |
 
 ### 4.2 MVP Admin
 
@@ -90,7 +90,6 @@ Calon tamu hotel mengalami **kesulitan besar** dalam tiga hal berikut sebelum da
 
 | Fitur | Prioritas |
 |---|---|
-| Pembayaran online (Midtrans/Xendit) | Should Have |
 | Notifikasi email/WhatsApp otomatis | Should Have |
 | Ulasan & rating tamu | Could Have |
 | Promo/diskon musiman | Could Have |
@@ -109,13 +108,16 @@ flowchart TD
     C --> D{Ada kamar kosong?}
     D -- Tidak --> E[Tampilkan info penuh + saran ubah tanggal/tipe] --> B
     D -- Ya --> F[Tamu pilih tipe kamar]
-    F --> G[Tamu isi data: nama, email, jumlah tamu]
+    F --> G[Tamu isi data tamu, nomor dan foto KTP]
     G --> H{Data valid & kamar masih tersedia?}
     H -- Tidak --> I[Tampilkan pesan error] --> G
-    H -- Ya --> J[Sistem simpan booking + buat kode booking unik]
-    J --> K[Sistem catat pemakaian kamar pada rentang tanggal]
-    K --> L[Tampilkan kode booking & rincian]
-    L --> M([Selesai])
+    H -- Ya --> J[Sistem membuat booking menunggu pembayaran]
+    J --> K[Midtrans memproses pembayaran]
+    K --> L{Notifikasi pembayaran valid dan lunas?}
+    L -- Tidak --> N[Booking tetap menunggu atau kedaluwarsa]
+    L -- Ya --> O[Booking dikonfirmasi dan kode booking diterbitkan]
+    O --> P[Tamu dapat membatalkan sampai 2 jam sebelum check-in]
+    P --> M([Selesai])
 ```
 
 ### 5.2 Mekanisme Ketersediaan Kamar (Kunci Sistem)
@@ -182,7 +184,7 @@ flowchart LR
 | Backend | Next.js Route Handlers (API Routes) | REST API terpadu dalam satu codebase |
 | Pola arsitektur | **MVC** | Model (Prisma), View (Pages/Components), Controller (Route Handlers + Service) |
 | Database | PostgreSQL (atau MySQL) + Prisma ORM | Penyimpanan data transaksional |
-| Autentikasi | NextAuth.js (Auth.js) + bcrypt | Login tamu & admin berbasis JWT |
+| Autentikasi | Admin session + bcrypt | Area admin terpisah; checkout tamu tanpa akun |
 | Validasi | Zod | Validasi input API |
 | State management | React Hooks / Zustand | State UI |
 | Deployment | Vercel + Supabase/Railway | Hosting frontend & database |
@@ -480,11 +482,20 @@ enum BookingStatus { PENDING CONFIRMED CANCELLED COMPLETED }
 
 ## 10. Kebutuhan Non-Fungsional
 
+### Privasi identitas tamu
+
+- Sebelum mengirim booking, tamu diberi tahu bahwa nomor dan foto KTP dipakai untuk verifikasi identitas dan administrasi reservasi.
+- Nomor dan foto KTP dienkripsi saat disimpan, tidak dikirim pada API cek booking atau daftar booking admin, dan hanya dapat dibuka melalui endpoint berautentikasi oleh admin untuk verifikasi yang diperlukan.
+- Data KTP dijadwalkan dihapus 30 hari setelah check-out atau pembatalan. Sistem menghapusnya saat proses aplikasi berikutnya berjalan; deployment produksi harus menyediakan proses terjadwal agar penghapusan berlangsung tepat waktu.
+- Akses dan masa simpan harus dijelaskan kepada tamu, dan penanganan data mengikuti kebijakan privasi hotel serta ketentuan pelindungan data yang berlaku.
+
+Pembatalan tamu dapat diajukan sampai dua jam sebelum waktu check-in pukul 14.00 WITA. Refund mengikuti status transaksi dan metode pembayaran Midtrans; metode yang tidak mendukung refund otomatis perlu diselesaikan petugas hotel.
+
 | Aspek | Kebutuhan |
 |---|---|
 | **Performa** | Halaman ketersediaan kamar termuat < 2 detik; query ketersediaan < 500 ms |
 | **Ketersediaan** | Uptime 99,5%; informasi ketersediaan selalu konsisten dengan data booking |
-| **Keamanan** | Password di-hash bcrypt; route admin terproteksi; validasi semua input dengan Zod; proteksi SQL injection via Prisma ORM |
+| **Keamanan** | Password di-hash bcrypt; route admin terproteksi; validasi input dengan Zod; foto/nomor KTP dienkripsi; Midtrans diverifikasi melalui notifikasi bertanda tangan |
 | **Kompatibilitas** | Responsif di mobile, tablet, dan desktop |
 | **Skalabilitas** | Struktur modular (service layer) agar mudah menambah fitur pasca-MVP |
 | **Bahasa** | Bahasa Indonesia (opsi multi-bahasa di backlog) |
@@ -518,8 +529,8 @@ enum BookingStatus { PENDING CONFIRMED CANCELLED COMPLETED }
 
 | Fase | Lingkup | Estimasi |
 |---|---|---|
-| **Fase 1 — MVP** | US-01 s.d. US-11 (ketersediaan kamar, fasilitas, jadwal makan, booking, panel admin dasar) | 6–8 minggu |
-| **Fase 2** | Dashboard okupansi (US-12), pembayaran online, notifikasi email/WhatsApp | 4 minggu |
+| **Fase 1 — MVP** | US-01 s.d. US-13 (ketersediaan kamar, fasilitas, jadwal makan, booking berbayar, pembatalan, panel admin dasar) | 6–8 minggu |
+| **Fase 2** | Dashboard okupansi (US-12), notifikasi email/WhatsApp | 4 minggu |
 | **Fase 3** | Ulasan tamu, promo, multi-bahasa, aplikasi mobile (PWA) | 4+ minggu |
 
 ---

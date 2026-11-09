@@ -26,11 +26,14 @@ Konsep: hangat, bersih, terpercaya. Nuansa krem/emas dipakai untuk kesan hotel p
 
 | Token | Hex | Peruntukan |
 |---|---|---|
-| `primary-900` | `#1B3A2F` | Judul besar, teks utama di atas background terang |
-| `primary-700` | `#2D5A45` | Heading sekunder, ikon penting |
-| `primary-500` | `#4A7C59` | **Aksen utama:** tombol utama, link, elemen interaktif |
+| `primary-950` | `#1C3028` | Footer dan bidang warna gelap |
+| `primary-900` | `#20392F` | Judul besar, teks utama di atas background terang |
+| `primary-700` | `#345747` | Heading sekunder, ikon penting |
+| `primary-500` | `#446B55` | **Aksen utama:** tombol utama, link, elemen interaktif |
 | `primary-100` | `#DDE8DF` | Background section alternatif, highlight ringan |
-| `primary-50`  | `#F2F7F3` | Background kartu lembut, chip status |
+| `primary-50`  | `#F2F4EF` | Background kartu lembut, chip status |
+
+Permukaan utama memakai putih hangat (`neutral-0: #FFFEFA`) dan krem (`paper: #FBFAF7`, `paper-deep: #F4F1E9`). Garis pemisah memakai `line: #E6E1D7`.
 
 | Token | Hex | Peruntukan |
 |---|---|---|
@@ -41,12 +44,12 @@ Konsep: hangat, bersih, terpercaya. Nuansa krem/emas dipakai untuk kesan hotel p
 
 | Token | Hex | Peruntukan |
 |---|---|---|
-| `neutral-900` | `#1A1A1A` | Teks utama body |
-| `neutral-600` | `#5C5C5C` | Teks sekunder (deskripsi, metadata) |
+| `neutral-900` | `#25342D` | Teks utama body |
+| `neutral-600` | `#656961` | Teks sekunder (deskripsi, metadata) |
 | `neutral-400` | `#9E9E9E` | Placeholder, teks non-aktif |
-| `neutral-200` | `#E5E5E5` | Border, divider |
-| `neutral-100` | `#F5F5F5` | Background section |
-| `neutral-0`   | `#FFFFFF` | Background kartu & tab aktif |
+| `neutral-200` | `#E6E1D7` | Border, divider |
+| `neutral-100` | `#F4F1E9` | Background section |
+| `neutral-0`   | `#FFFEFA` | Background kartu & tab aktif |
 
 ### 2.3 Warna Status (Wajib Konsisten di Semua Tab)
 
@@ -126,11 +129,11 @@ module.exports = {
 
 | Token | Font | Ukuran | Berat | Peruntukan |
 |---|---|---|---|---|
-| `font-display` | Playfair Display (serif) | 36–48px | 600/700 | Judul hero, heading halaman/tab |
-| `font-heading` | Plus Jakarta Sans | 24–32px | 600 | Heading section, judul kartu |
-| `font-body` | Plus Jakarta Sans | 16px | 400 | Paragraf, deskripsi |
-| `font-small` | Plus Jakarta Sans | 14px | 400/500 | Metadata, keterangan kecil |
-| `font-tiny` | Plus Jakarta Sans | 12px | 500 | Badge, label status |
+| `font-display` | Cormorant Garamond (serif) | 48–72px | 500/600 | Judul hero dan heading halaman |
+| `font-heading` | DM Sans | 20–27px | 500/600 | Heading section, judul kartu |
+| `font-body` | DM Sans | 15px | 400 | Paragraf, deskripsi |
+| `font-small` | DM Sans | 13px | 400/500 | Metadata, keterangan kecil |
+| `font-tiny` | DM Sans | 11px | 500 | Badge, label status |
 
 - Line-height body: **1.6**; heading: **1.2**.
 - Skala heading konsisten: H1 40px → H2 28px → H3 22px → H4 18px.
@@ -381,20 +384,25 @@ Empty state: ilustrasi + "Tidak ada kamar pada tanggal ini" + tombol "Ubah Tangg
 Booking tetap **halaman terpisah** (bukan tab) karena butuh fokus penuh tanpa distraksi tab.
 ```
 [Navbar]
-[Stepper: 1. Tanggal → 2. Data Tamu → 3. Konfirmasi]
+[Stepper: 1. Tanggal → 2. Identitas → 3. Pembayaran → 4. Konfirmasi]
 [Kolom kiri (form)        | Kolom kanan (ringkasan):   ]
-[ nama, email, tamu, dll ] [  foto kamar, tanggal,     ]
+[ nama, email, nomor dan foto KTP, tamu ] [ foto kamar, tanggal, ]
 [                          [  harga/malam × n malam,   ]
 [                          [  total (accent-500),       ]
-[                          [  tombol Booking Sekarang ] ]
+[                          [  tombol Bayar dengan Midtrans ] ]
 Mobile: ringkasan pindah ke bawah form.
 ```
+- Tampilkan tujuan penggunaan KTP, persetujuan pemrosesan, dan retensi 30 hari setelah check-out atau pembatalan.
+- Booking baru menunggu pembayaran; hanya notifikasi Midtrans yang diverifikasi server dapat mengonfirmasi pembayaran.
+- Pembatalan oleh tamu tersedia sampai 2 jam sebelum check-in; tampilkan batas dan aturan pengembalian dana sebelum pembayaran.
 
 ### 6.8 Layout Admin (`/admin/*`)
 - Sidebar kiri gelap (`primary-900`, 240px): Kamar, Fasilitas, Jam Makan, Booking, Dashboard.
 - Konten kanan: header halaman + aksi utama (tombol "Tambah") + tabel/kartu.
 - Tabel admin: header `primary-50`, zebra row `neutral-100`, aksi row berupa ikon edit/hapus dengan tooltip.
 - Admin **tidak** menggunakan warna aksen emas untuk dekorasi — aksen hanya status.
+- Admin memakai area route terpisah dari website tamu. `/admin/login` dan `/admin` tidak menampilkan navbar, tab, modal, atau footer tamu.
+- Dashboard admin memakai sidebar dan header sendiri; sesi admin diperlukan pada setiap route admin.
 
 ---
 

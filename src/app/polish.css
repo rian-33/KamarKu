@@ -1,0 +1,493 @@
+/* KamarKu's visual finish: warm surfaces, editorial serif headlines, quieter controls. */
+:root {
+  --paper: #fbfaf7;
+  --paper-deep: #f4f1e9;
+  --ink: #25342d;
+  --line: #e6e1d7;
+  --neutral-0: #fffefa;
+  --primary-950: #1c3028;
+  --primary-900: #20392f;
+  --primary-700: #345747;
+  --primary-500: #446b55;
+  --primary-50: #f2f4ef;
+  --neutral-900: #25342d;
+  --neutral-600: #656961;
+  --neutral-200: #e6e1d7;
+  --neutral-100: #f4f1e9;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  letter-spacing: 0.005em;
+}
+
+.topbar,
+.tabbar {
+  background: var(--paper);
+}
+
+.topbar {
+  border-bottom-color: var(--line);
+}
+
+.tabbar {
+  height: 64px;
+  gap: 6px;
+  border-bottom-color: var(--line);
+  backdrop-filter: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 100%;
+  padding: 0 15px;
+  border-radius: 0;
+  color: #686b65;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+}
+
+.tab-icon {
+  flex: 0 0 auto;
+  color: currentColor;
+  transition: transform 180ms ease;
+}
+
+.tab:hover {
+  background: transparent;
+  color: var(--primary-900);
+}
+
+.tab:hover .tab-icon {
+  transform: translateY(-1px);
+}
+
+.tab.active {
+  background: transparent;
+  color: var(--primary-700);
+}
+
+.tab.active::after {
+  position: absolute;
+  right: 14px;
+  bottom: -1px;
+  left: 14px;
+  height: 2px;
+  background: var(--accent-500);
+  content: '';
+  transform: scaleX(0.72);
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.tab.active:hover::after {
+  transform: scaleX(1);
+}
+
+.hero h1,
+.page-head h1,
+.intro h2,
+.quote-inner h2,
+.about-columns h2,
+.lookup h2,
+.booking-modal h2,
+.admin-head h2,
+.quick-card h3,
+.facility-card h3,
+.room-title h3,
+.meal-head h3,
+.admin-booking-row strong {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -0.025em;
+}
+
+.hero h1 {
+  font-size: clamp(66px, 8vw, 100px);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  max-width: 680px;
+}
+
+.page-head h1 {
+  font-size: clamp(52px, 6vw, 72px);
+  line-height: 0.98;
+}
+
+.intro h2,
+.about-columns h2,
+.quote-inner h2 {
+  font-size: clamp(46px, 5vw, 62px);
+  line-height: 1.02;
+}
+
+.quick-card h3,
+.facility-card h3,
+.room-title h3,
+.meal-head h3 {
+  font-size: 27px;
+  line-height: 1.05;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.button,
+.button-small,
+.tab,
+.availability,
+.category-chip {
+  border-radius: 3px;
+}
+
+.button {
+  background: var(--primary-700);
+  letter-spacing: 0.025em;
+}
+
+.button:hover {
+  background: var(--primary-900);
+}
+
+.room-card,
+.meal-card {
+  border-color: var(--line);
+  background: var(--neutral-0);
+  box-shadow: none;
+}
+
+.room-info {
+  padding: 22px 22px 24px;
+}
+
+.meal-card {
+  padding: 27px;
+}
+
+.hero-content > p,
+.page-head > p,
+.intro > p,
+.quick-card p,
+.room-info > p,
+.facility-card p,
+.about-columns p,
+.meal-card li,
+.contact-info > p,
+.lookup p {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.search-panel label,
+.booking-form label,
+.lookup form > label,
+.meal-date label {
+  font-size: 14px;
+}
+
+.search-panel input,
+.search-panel select,
+.booking-form input,
+.booking-form select,
+.lookup-control input,
+.meal-date input {
+  min-height: 46px;
+  font-size: 15px;
+}
+
+.results-caption,
+.room-meta,
+.amenities span,
+.availability,
+.category-chip,
+.filters button,
+.booking-form > small,
+.booking-summary > small,
+.footer-main > div > a:not(.brand) {
+  font-size: 13px;
+}
+
+.filters button {
+  min-height: 40px;
+  padding: 8px 15px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--neutral-600);
+}
+
+.filters button:hover {
+  border-color: var(--line);
+  background: var(--neutral-0);
+  color: var(--primary-900);
+}
+
+.filters button.selected {
+  border-color: var(--primary-700);
+  background: var(--primary-700);
+  color: #fff;
+}
+
+.room-title > span {
+  font-size: 16px;
+}
+
+.room-title > span small {
+  font-size: 12px;
+}
+
+.quick-card,
+.room-card,
+.facility-card,
+.meal-card,
+.category-chip,
+.admin-sidebar nav button,
+.admin-row-actions button,
+.admin-form-grid button,
+.admin-list-row button {
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.quick-card:hover,
+.quick-card:focus-visible {
+  transform: translateY(-4px);
+}
+
+.quick-photo {
+  transition: filter 180ms ease;
+}
+
+.quick-card:hover .quick-photo {
+  filter: saturate(1.08) brightness(1.03);
+}
+
+.room-card:hover,
+.facility-card:hover,
+.meal-card:hover {
+  transform: translateY(-3px);
+  border-color: #c9c2b3;
+  box-shadow: 0 12px 28px rgba(32, 57, 47, 0.08);
+}
+
+.button:active,
+.tab:active,
+.admin-sidebar nav button:active,
+.admin-row-actions button:active,
+.admin-form-grid button:active {
+  transform: translateY(1px);
+}
+
+input,
+select,
+textarea {
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(68, 107, 85, 0.12);
+}
+
+.search-panel,
+.lookup {
+  background: var(--paper-deep);
+  border-color: var(--line);
+}
+
+.booking-modal {
+  background: var(--neutral-0);
+  box-shadow: 0 20px 70px rgba(28, 42, 34, 0.16);
+}
+
+.footer,
+.quote-band {
+  background: var(--primary-950);
+}
+
+.admin-login-card h1,
+.admin-page-title h1,
+.admin-panel-card h2,
+.admin-sidebar-brand {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.admin-sidebar nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 43px;
+  padding: 10px 13px;
+  border-radius: 3px;
+  color: #d0d9d2;
+  font-size: 14px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.admin-sidebar nav button.selected {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 2px 0 var(--accent-500);
+  color: #fff;
+}
+
+.admin-nav-icon {
+  flex: 0 0 18px;
+  color: #aebeb2;
+}
+
+.admin-sidebar nav button.selected .admin-nav-icon {
+  color: #d8c47f;
+}
+
+.admin-sidebar-bottom a,
+.admin-sidebar-bottom button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 3px;
+}
+
+.admin-stat-grid article,
+.admin-panel-card {
+  border-radius: 3px;
+}
+
+.admin-page-title p,
+.admin-panel-card p,
+.admin-booking-row small,
+.admin-empty,
+.admin-list-row,
+.admin-stat-grid article > span {
+  font-size: 13px;
+}
+
+.admin-form-grid label,
+.admin-date,
+.admin-time-form label {
+  font-size: 13px;
+}
+
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-date input,
+.admin-time-form input {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.admin-primary,
+.admin-secondary,
+.admin-danger,
+.admin-row-actions button,
+.admin-list-row button {
+  min-height: 39px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.admin-status {
+  font-size: 11px;
+}
+
+.admin-stat-grid small,
+.admin-login-card > small,
+.admin-login-error,
+.admin-topbar > div > span {
+  font-size: 12px;
+}
+
+.admin-login-card label {
+  font-size: 13px;
+}
+
+.admin-login-card > p {
+  font-size: 14px;
+}
+
+.footer-main > div > p {
+  font-size: 13px;
+}
+
+.footer-bottom {
+  font-size: 11px;
+}
+
+.admin-sidebar nav button:hover {
+  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.admin-sidebar nav button.selected:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.admin-row-actions button:hover,
+.admin-list-row button:hover {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+@media (max-width: 620px) {
+  .tabbar {
+    height: 54px;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0 10px;
+  }
+
+  .tab {
+    gap: 7px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .tab.active::after {
+    right: 10px;
+    left: 10px;
+  }
+}
+
+@media (max-width: 620px) {
+  .hero h1 {
+    font-size: clamp(54px, 15vw, 74px);
+  }
+
+  .page-head h1 {
+    font-size: 49px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  .page-head > p,
+  .room-info > p,
+  .facility-card p,
+  .meal-card li,
+  .about-columns p,
+  .lookup p {
+    font-size: 14px;
+  }
+
+  .admin-sidebar nav button {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
