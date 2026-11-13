@@ -25,16 +25,21 @@ export async function POST(request: NextRequest) {
   if (!booking) return NextResponse.json({ error: 'Kode transaksi tidak ditemukan.' }, { status: 404 });
   if (Math.round(Number(grossAmount)) !== booking.total) return NextResponse.json({ error: 'Nominal transaksi tidak cocok.' }, { status: 400 });
 
-  if (transactionStatus === 'settlement' || (transactionStatus === 'capture' && fraudStatus === 'accept')) {
-    if (booking.status === 'pending') {
-      db.prepare("UPDATE bookings SET status='confirmed',payment_status='paid',paid_at=?,payment_expires_at=NULL WHERE code=?").run(new Date().toISOString(),orderId);
-    } else {
-      db.prepare("UPDATE bookings SET payment_status='paid_late',paid_at=? WHERE code=? AND payment_status!='paid'").run(new Date().toISOString(),orderId);
-    }
+  const paid = transactionStatus === 'settlement' || (transactionStatus === 'capture' && fraudStatus === 'accept');
+  const now = new Date().toISOString();
+  if (paid) {
+    // Make repeat notifications idempotent and never reopen a cancelled/expired reservation.
+    db.prepare(`UPDATE bookings SET status='confirmed',payment_status='paid',paid_at=COALESCE(paid_at,?),payment_expires_at=NULL
+      WHERE code=? AND status='pending' AND payment_status IN ('pending','paid')`).run(now,orderId);
+    db.prepare(`UPDATE bookings SET payment_status='paid_late',paid_at=COALESCE(paid_at,?)
+      WHERE code=? AND status='cancelled' AND payment_status NOT IN ('paid_late','refunded','partially_refunded')`).run(now,orderId);
   } else if (transactionStatus === 'expire' || transactionStatus === 'deny' || transactionStatus === 'cancel') {
-    db.prepare("UPDATE bookings SET status='cancelled',payment_status=?,cancelled_at=?,identity_delete_at=? WHERE code=? AND status='pending'").run(transactionStatus, new Date().toISOString(), new Date(Date.parse(`${hotelToday()}T00:00:00Z`) + 30*86400000).toISOString().slice(0,10),orderId);
+    db.prepare(`UPDATE bookings SET status='cancelled',payment_status=?,cancelled_at=COALESCE(cancelled_at,?),
+      identity_delete_at=COALESCE(identity_delete_at,?) WHERE code=? AND status='pending' AND payment_status='pending'`)
+      .run(transactionStatus,now,new Date(Date.parse(`${hotelToday()}T00:00:00Z`) + 30*86400000).toISOString().slice(0,10),orderId);
   } else if (transactionStatus === 'refund' || transactionStatus === 'partial_refund') {
-    db.prepare('UPDATE bookings SET payment_status=? WHERE code=?').run(transactionStatus === 'refund' ? 'refunded' : 'partially_refunded',orderId);
+    db.prepare(`UPDATE bookings SET payment_status=? WHERE code=? AND payment_status IN ('paid','paid_late','refund_requested','partially_refunded')`)
+      .run(transactionStatus === 'refund' ? 'refunded' : 'partially_refunded',orderId);
   }
   return NextResponse.json({ received: true });
 }

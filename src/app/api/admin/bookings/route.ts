@@ -11,7 +11,7 @@ const statusSchema = z.object({ status: z.enum(['confirmed', 'cancelled', 'compl
 export function GET(request: NextRequest) {
   if (!isAdminRequest(request)) return NextResponse.json({ error: 'Akses admin diperlukan.' }, { status: 401 });
   const bookings = getDb().prepare(`SELECT b.code,b.name,b.email,b.room_id AS roomId,r.name AS roomName,b.check_in AS checkIn,b.check_out AS checkOut,b.guests,b.total,b.status,b.payment_status AS paymentStatus,b.paid_at AS paidAt,b.refund_status AS refundStatus,(b.identity_photo_encrypted IS NOT NULL) AS identityProvided FROM bookings b JOIN rooms r ON r.id=b.room_id ORDER BY b.created_at DESC`).all();
-  return NextResponse.json({ bookings });
+  return NextResponse.json({ bookings }, { headers: { 'Cache-Control': 'no-store, private' } });
 }
 
 export async function PATCH(request: NextRequest) {

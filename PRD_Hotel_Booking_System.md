@@ -7,7 +7,7 @@
 | **Versi Dokumen** | 1.0 |
 | **Tanggal** | 19 Oktober 2026 |
 | **Status** | Draft untuk Persetujuan |
-| **Teknologi** | Next.js (Full-stack), Prisma ORM, PostgreSQL, Tailwind CSS, NextAuth.js |
+| **Teknologi rencana awal** | Next.js (Full-stack), Prisma ORM, PostgreSQL, Tailwind CSS, NextAuth.js |
 
 ---
 
@@ -178,16 +178,18 @@ flowchart LR
 
 ### 7.1 Stack Teknologi
 
+Tabel berikut mencatat implementasi yang sedang berjalan, bukan rancangan awal pada bagian 7.2 dan seterusnya. Sebagian endpoint dan struktur dalam dokumen ini masih berupa target dan belum tersedia di aplikasi.
+
 | Lapisan | Teknologi | Kegunaan |
 |---|---|---|
-| Frontend | Next.js App Router + React + Tailwind CSS | Halaman publik (tamu) dan panel admin |
-| Backend | Next.js Route Handlers (API Routes) | REST API terpadu dalam satu codebase |
-| Pola arsitektur | **MVC** | Model (Prisma), View (Pages/Components), Controller (Route Handlers + Service) |
-| Database | PostgreSQL (atau MySQL) + Prisma ORM | Penyimpanan data transaksional |
-| Autentikasi | Admin session + bcrypt | Area admin terpisah; checkout tamu tanpa akun |
+| Frontend | Next.js App Router + React + CSS global | Halaman publik dan panel admin |
+| Backend | Next.js Route Handlers | API terpadu dalam satu codebase |
+| Pola arsitektur | Route handlers + modul `src/lib` | Aturan bisnis dan akses data berada dalam handler dan helper |
+| Database | SQLite melalui `node:sqlite` | Penyimpanan lokal pada satu host; Prisma belum dipakai runtime |
+| Autentikasi | Cookie sesi bertanda tangan + bcrypt | Area admin terpisah; checkout tamu tanpa akun |
 | Validasi | Zod | Validasi input API |
-| State management | React Hooks / Zustand | State UI |
-| Deployment | Vercel + Supabase/Railway | Hosting frontend & database |
+| State management | React Hooks | State UI |
+| Deployment | Satu host Node dengan disk persisten | SQLite lokal tidak sesuai untuk deployment multi-instance/serverless |
 
 ### 7.2 Struktur Folder MVC
 

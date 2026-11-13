@@ -127,6 +127,12 @@ export default function AdminConsole() {
     booking: Booking,
     status: 'confirmed' | 'cancelled' | 'completed',
   ) {
+    if (
+      status === 'cancelled' &&
+      !window.confirm(`Batalkan booking ${booking.code} atas nama ${booking.name}?`)
+    ) {
+      return;
+    }
     try {
       await json(`/api/admin/bookings?code=${encodeURIComponent(booking.code)}`, {
         method: 'PATCH',
@@ -168,6 +174,8 @@ export default function AdminConsole() {
     }
   }
   async function deleteRoom(id: string) {
+    const room = rooms.find((item) => item.id === id);
+    if (!window.confirm(`Hapus tipe kamar ${room?.name ?? id}?`)) return;
     try {
       await json(`/api/admin/rooms/${id}`, { method: 'DELETE' });
       await refreshAll();
@@ -205,6 +213,8 @@ export default function AdminConsole() {
     }
   }
   async function deleteFacility(id: string) {
+    const facility = facilities.find((item) => item.id === id);
+    if (!window.confirm(`Hapus fasilitas ${facility?.name ?? id}?`)) return;
     try {
       await json(`/api/admin/facilities/${id}`, { method: 'DELETE' });
       await refreshAll();

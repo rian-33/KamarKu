@@ -20,6 +20,12 @@ Buka `http://localhost:3000`. Build produksi dapat dibuat dengan `npm run build`
 - Login admin menggunakan `ADMIN_EMAIL`, bcrypt `ADMIN_PASSWORD_HASH`, dan cookie HttpOnly bertanda tangan (`AUTH_SECRET`). Admin dapat mengelola status booking, fasilitas, menu per tanggal, dan jam makan; kamar dapat ditambahkan.
 - Informasi fasilitas, menu, profil hotel, dan lokasi ditampilkan; konten tersebut masih berupa contoh statis.
 
+## Catatan implementasi
+
+Runtime saat ini memakai `node:sqlite` melalui `src/lib/db.ts`; `prisma/schema.prisma` belum dipakai oleh route aplikasi dan bukan skema database aktif. Jalankan aplikasi pada satu proses Node dengan file database persisten. Jangan gunakan data hotel contoh, foto stok, alamat, nomor kontak, maupun kebijakan contoh sebagai informasi operasional sebelum diverifikasi.
+
+Notifikasi pembayaran Midtrans harus diarahkan ke endpoint webhook dan diuji pada sandbox sebelum transaksi nyata. Endpoint booking publik hanya menampilkan ringkasan berdasarkan kode booking; endpoint administrasi yang memuat data tamu mengirim header `Cache-Control: no-store`.
+
 Salin `.env.example` ke `.env.local`, lalu buat hash password dan secret sebelum login admin dan checkout:
 
 ```bash
