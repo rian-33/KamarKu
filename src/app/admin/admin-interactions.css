@@ -1,0 +1,150 @@
+.admin-booking-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px) auto;
+  align-items: end;
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.admin-booking-filters label {
+  display: grid;
+  gap: 6px;
+  color: var(--neutral-600);
+  font-size: 14px;
+}
+
+.admin-booking-filters input,
+.admin-booking-filters select {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 11px;
+  font: inherit;
+}
+
+.admin-booking-filters > span {
+  padding-bottom: 11px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.admin-app {
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.admin-sidebar-brand {
+  font-size: 19px;
+}
+
+.admin-sidebar-brand small {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+}
+
+.admin-eyebrow,
+.admin-back,
+.admin-identity {
+  font-size: 14px;
+}
+
+.admin-sidebar-label,
+.admin-page-title > div > span,
+.admin-panel-heading > div > span,
+.admin-topbar > div > span {
+  font-size: 13px;
+  letter-spacing: 1.1px;
+}
+
+.admin-sidebar nav button,
+.admin-sidebar-bottom button,
+.admin-sidebar-bottom a,
+.admin-topbar,
+.admin-page-title p,
+.admin-stat-grid article > span,
+.admin-stat-grid small,
+.admin-panel-card p,
+.admin-empty,
+.admin-list-row,
+.admin-form-grid label,
+.admin-date,
+.admin-time-form label,
+.admin-login-card label,
+.admin-login-card > p {
+  font-size: 15px;
+}
+
+.admin-user,
+.admin-booking-row small,
+.admin-list-row button,
+.admin-row-actions button,
+.admin-primary,
+.admin-secondary,
+.admin-danger,
+.admin-status,
+.admin-message,
+.admin-refresh,
+.admin-panel-heading > button {
+  font-size: 14px;
+}
+
+.admin-booking-row strong {
+  font-size: 17px;
+}
+
+.admin-stat-grid strong {
+  font-size: 34px;
+}
+
+.admin-stat-grid small {
+  font-size: 14px;
+}
+
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-date input,
+.admin-time-form input,
+.admin-booking-filters input,
+.admin-booking-filters select,
+.admin-login-card input {
+  min-height: 46px;
+  font-size: 15px;
+}
+
+.admin-submit {
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.admin-login-card > small,
+.admin-login-error {
+  font-size: 14px;
+}
+
+@media (max-width: 620px) {
+  .admin-sidebar nav button {
+    font-size: 14px;
+  }
+
+  .admin-topbar,
+  .admin-page-title p,
+  .admin-stat-grid article > span,
+  .admin-panel-card p,
+  .admin-booking-row small {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-booking-filters {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-booking-filters label:first-child {
+    grid-column: 1 / -1;
+  }
+}

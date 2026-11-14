@@ -58,6 +58,8 @@ export default function AdminConsole() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingSearch, setBookingSearch] = useState('');
+  const [bookingStatusFilter, setBookingStatusFilter] = useState('all');
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [menus, setMenus] = useState<Menu[]>([]);
   const [identities, setIdentities] = useState<
@@ -76,6 +78,12 @@ export default function AdminConsole() {
   });
   const [newMenu, setNewMenu] = useState({ scheduleId: 1, dishName: '', category: 'main' });
   const router = useRouter();
+  const filteredBookings = bookings.filter((booking) => {
+    const query = bookingSearch.trim().toLocaleLowerCase('id-ID');
+    const matchesQuery = !query || [booking.code, booking.name, booking.email, booking.roomName]
+      .some((value) => value.toLocaleLowerCase('id-ID').includes(query));
+    return matchesQuery && (bookingStatusFilter === 'all' || booking.status === bookingStatusFilter);
+  });
   async function json(url: string, init?: RequestInit) {
     const response = await fetch(url, { cache: 'no-store', ...init });
     const data = await response.json();
@@ -389,9 +397,35 @@ export default function AdminConsole() {
                   ↻ Perbarui
                 </button>
               </div>
+              <div className="admin-booking-filters">
+                <label>
+                  Cari tamu, kode, atau kamar
+                  <input
+                    type="search"
+                    value={bookingSearch}
+                    onChange={(event) => setBookingSearch(event.target.value)}
+                    placeholder="Contoh: KK…, nama tamu"
+                  />
+                </label>
+                <label>
+                  Status
+                  <select
+                    value={bookingStatusFilter}
+                    onChange={(event) => setBookingStatusFilter(event.target.value)}
+                  >
+                    <option value="all">Semua status</option>
+                    <option value="pending">Menunggu</option>
+                    <option value="confirmed">Terkonfirmasi</option>
+                    <option value="cancelled">Dibatalkan</option>
+                    <option value="completed">Selesai</option>
+                  </select>
+                </label>
+                <span>{filteredBookings.length} booking</span>
+              </div>
               <section className="admin-panel-card">
                 <BookingTable
-                  bookings={bookings}
+                  bookings={filteredBookings}
+                  emptyMessage={bookings.length ? 'Tidak ada hasil untuk filter ini.' : 'Belum ada pemesanan.'}
                   onStatus={setBookingStatus}
                   identities={identities}
                   onIdentity={loadIdentity}
@@ -762,16 +796,18 @@ function BookingTable({
   onStatus,
   identities,
   onIdentity,
+  emptyMessage = 'Belum ada pemesanan.',
 }: {
   bookings: Booking[];
   onStatus: (booking: Booking, status: 'confirmed' | 'cancelled' | 'completed') => void;
   identities: Record<string, { identityNumber: string; photoDataUrl: string }>;
   onIdentity: (code: string) => void;
+  emptyMessage?: string;
 }) {
   return (
     <div className="admin-booking-list">
       {bookings.length === 0 ? (
-        <p className="admin-empty">Belum ada pemesanan.</p>
+        <p className="admin-empty">{emptyMessage}</p>
       ) : (
         bookings.map((booking) => (
           <article className="admin-booking-row" key={booking.code}>
