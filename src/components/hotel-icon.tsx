@@ -15,7 +15,10 @@ export type HotelIconName =
   | 'moon'
   | 'arrow-up-right'
   | 'door'
-  | 'user';
+  | 'user'
+  | 'close'
+  | 'check'
+  | 'leaf';
 
 const drawings: Record<HotelIconName, ReactNode> = {
   home: <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-6h6v6"/></>,
@@ -33,6 +36,9 @@ const drawings: Record<HotelIconName, ReactNode> = {
   'arrow-up-right': <><path d="M7 17 17 7M8 7h9v9"/></>,
   door: <><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17M3 21h18"/><path d="M14 12h.01"/></>,
   user: <><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-1a7 7 0 0 1 14 0v1"/></>,
+  close: <path d="m6 6 12 12M18 6 6 18"/>,
+  check: <path d="m5 12 4 4L19 6"/>,
+  leaf: <><path d="M20 4c-8 0-14 3-14 10a6 6 0 0 0 6 6c7 0 8-8 8-16Z"/><path d="M4 21c2-5 6-9 12-12"/></>,
 };
 
 export function HotelIcon({ name, size = 18, strokeWidth = 1.65, className }: { name: HotelIconName; size?: number; strokeWidth?: number; className?: string }) {

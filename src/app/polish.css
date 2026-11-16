@@ -462,8 +462,85 @@ textarea:focus {
   animation: toast-enter 180ms ease-out both;
 }
 
+/* Room cards: clearer sans-serif details and consistent action alignment. */
+.room-grid {
+  align-items: stretch;
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.room-image {
+  flex: 0 0 auto;
+}
+
+.room-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.room-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+
+.room-title h3 {
+  min-width: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.room-title > span {
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.room-title > span small {
+  font-size: 13px;
+}
+
+.room-info > p {
+  min-height: 56px;
+  margin-block: 12px 10px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.room-meta {
+  min-height: 24px;
+  font-size: 14px;
+}
+
+.amenities {
+  min-height: 38px;
+  align-content: start;
+  margin-block: 15px 18px;
+}
+
+.amenities span {
+  font-size: 14px;
+}
+
+.room-book {
+  margin-top: auto;
+  min-height: 52px;
+  font-size: 15px;
+}
+
 /* Readable type scale: keep supporting text comfortably above browser defaults. */
 body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 17px;
   line-height: 1.65;
 }
@@ -660,6 +737,14 @@ main[style*='min-height'] > section > p[style*='font-size'] {
 
   .admin-sidebar nav button {
     font-size: 12px;
+  }
+
+  .room-title h3 {
+    font-size: 23px;
+  }
+
+  .room-info > p {
+    min-height: 0;
   }
 }
 
