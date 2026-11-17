@@ -21,8 +21,11 @@ export async function POST(request: NextRequest, context: { params: Promise<{ co
   let refundStatus = 'not_required';
   try {
     const serverKey = process.env.MIDTRANS_SERVER_KEY;
-    if (!serverKey) return NextResponse.json({ error: 'Layanan pembayaran belum dikonfigurasi; hubungi hotel untuk pembatalan.' }, { status: 503 });
-    if (booking.paymentStatus === 'pending') {
+    const demoMode = process.env.NODE_ENV !== 'production' && process.env.PAYMENT_DEMO_MODE === 'true';
+    if (!serverKey && !demoMode) return NextResponse.json({ error: 'Layanan pembayaran belum dikonfigurasi; hubungi hotel untuk pembatalan.' }, { status: 503 });
+    if (demoMode && ['paid', 'paid_late'].includes(booking.paymentStatus)) {
+      refundStatus = 'demo_no_refund';
+    } else if (!demoMode && booking.paymentStatus === 'pending') {
       let providerStatus: string | null = null;
       try { providerStatus = (await getMidtransStatus(booking.orderId ?? booking.code)).transaction_status; }
       catch { /* No payment channel has been selected; cancel its unused Snap page. */ }
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ co
       } else if (booking.token) {
         await cancelMidtransSession(booking.token);
       }
-    } else if (booking.paymentStatus === 'paid' || booking.paymentStatus === 'paid_late') {
+    } else if (!demoMode && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'paid_late')) {
       try {
         const provider = await getMidtransStatus(booking.orderId ?? booking.code);
         if (provider.transaction_status === 'settlement') await requestMidtransRefund(booking.orderId ?? booking.code,booking.total,`refund-${booking.code}`);
@@ -43,7 +46,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ co
         else if (provider.transaction_status !== 'cancel' && provider.transaction_status !== 'expire' && provider.transaction_status !== 'deny') refundStatus='manual_required';
       } catch { refundStatus='manual_required'; }
       if (refundStatus !== 'manual_required') refundStatus='refund_requested';
-    } else if (booking.paymentStatus === 'paid_late') {
+    } else if (!demoMode && booking.paymentStatus === 'paid_late') {
       refundStatus = 'manual_required';
     }
   } catch {

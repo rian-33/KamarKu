@@ -16,6 +16,7 @@ type Facility = { id: string; name: string; category: string; description: strin
 type Booking = {
   code: string;
   name: string;
+  phone: string | null;
   email: string;
   roomId: string;
   roomName: string;
@@ -26,7 +27,6 @@ type Booking = {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   paymentStatus: string;
   refundStatus: string | null;
-  identityProvided: boolean;
 };
 type Schedule = {
   id: number;
@@ -62,9 +62,6 @@ export default function AdminConsole() {
   const [bookingStatusFilter, setBookingStatusFilter] = useState('all');
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [menus, setMenus] = useState<Menu[]>([]);
-  const [identities, setIdentities] = useState<
-    Record<string, { identityNumber: string; photoDataUrl: string }>
-  >({});
   const [menuDate, setMenuDate] = useState(
     new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Makassar' }),
   );
@@ -111,25 +108,8 @@ export default function AdminConsole() {
     void refreshAll();
   }, [menuDate]);
   async function logout() {
-    setIdentities({});
     await fetch('/api/admin/session', { method: 'DELETE' });
     router.replace('/admin/login');
-  }
-  async function loadIdentity(code: string) {
-    if (identities[code]) {
-      setIdentities((all) => {
-        const next = { ...all };
-        delete next[code];
-        return next;
-      });
-      return;
-    }
-    try {
-      const data = await json(`/api/admin/bookings/${encodeURIComponent(code)}/identity`);
-      setIdentities((all) => ({ ...all, [code]: data }));
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Data identitas gagal dimuat.');
-    }
   }
   async function setBookingStatus(
     booking: Booking,
@@ -379,8 +359,6 @@ export default function AdminConsole() {
                 <BookingTable
                   bookings={bookings.slice(0, 6)}
                   onStatus={setBookingStatus}
-                  identities={identities}
-                  onIdentity={loadIdentity}
                 />
               </section>
             </>
@@ -427,8 +405,6 @@ export default function AdminConsole() {
                   bookings={filteredBookings}
                   emptyMessage={bookings.length ? 'Tidak ada hasil untuk filter ini.' : 'Belum ada pemesanan.'}
                   onStatus={setBookingStatus}
-                  identities={identities}
-                  onIdentity={loadIdentity}
                 />
               </section>
             </>
@@ -794,14 +770,10 @@ export default function AdminConsole() {
 function BookingTable({
   bookings,
   onStatus,
-  identities,
-  onIdentity,
   emptyMessage = 'Belum ada pemesanan.',
 }: {
   bookings: Booking[];
   onStatus: (booking: Booking, status: 'confirmed' | 'cancelled' | 'completed') => void;
-  identities: Record<string, { identityNumber: string; photoDataUrl: string }>;
-  onIdentity: (code: string) => void;
   emptyMessage?: string;
 }) {
   return (
@@ -817,28 +789,12 @@ function BookingTable({
                 {booking.code} · {booking.roomName} · {booking.checkIn} – {booking.checkOut}
               </small>
               <small>
-                {booking.email} · {booking.guests} tamu · {currency(booking.total)}
+                {booking.phone ? `${booking.phone} · ` : ''}{booking.email} · {booking.guests} tamu · {currency(booking.total)}
               </small>
               <small>
                 Pembayaran: {booking.paymentStatus}
-                {booking.refundStatus ? ` · Refund: ${booking.refundStatus}` : ''} · KTP{' '}
-                {booking.identityProvided ? 'tersimpan terenkripsi' : 'sudah tidak tersedia'}
+                {booking.refundStatus ? ` · Refund: ${booking.refundStatus}` : ''}
               </small>
-              {booking.identityProvided && (
-                <button className="admin-secondary" onClick={() => void onIdentity(booking.code)}>
-                  {identities[booking.code] ? 'Sembunyikan KTP' : 'Lihat data KTP'}
-                </button>
-              )}
-              {identities[booking.code] && (
-                <div className="admin-identity">
-                  <strong>Nomor KTP: {identities[booking.code].identityNumber}</strong>
-                  <img
-                    src={identities[booking.code].photoDataUrl}
-                    alt={`Foto KTP booking ${booking.code}`}
-                    loading="lazy"
-                  />
-                </div>
-              )}
             </div>
             <span className={`admin-status admin-status-${booking.status}`}>
               {bookingNames[booking.status]}

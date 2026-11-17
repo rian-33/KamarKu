@@ -27,8 +27,26 @@ const starterMenus = [
   ['DINNER', 'Ayam panggang madu', 'main'], ['DINNER', 'Tumis sayuran', 'side'], ['DINNER', 'Nasi pandan', 'side'], ['DINNER', 'Puding kelapa', 'dessert'],
 ] as const;
 
+const bookingMigrations: [string, string][] = [
+  ['phone', 'TEXT'],
+  ['identity_number_encrypted', 'TEXT'], ['identity_photo_encrypted', 'TEXT'], ['identity_photo_mime', 'TEXT'],
+  ['identity_consent_at', 'TEXT'], ['identity_delete_at', 'TEXT'], ['payment_status', "TEXT NOT NULL DEFAULT 'not_started'"],
+  ['payment_order_id', 'TEXT'], ['payment_token', 'TEXT'], ['payment_url', 'TEXT'], ['payment_expires_at', 'TEXT'],
+  ['paid_at', 'TEXT'], ['cancelled_at', 'TEXT'], ['refund_status', 'TEXT'],
+];
+
+function migrateBookingColumns(db: DatabaseSync) {
+  const columns = new Set((db.prepare('PRAGMA table_info(bookings)').all() as { name: string }[]).map((column) => column.name));
+  for (const [column, type] of bookingMigrations) {
+    if (!columns.has(column)) db.exec(`ALTER TABLE bookings ADD COLUMN ${column} ${type}`);
+  }
+}
+
 export function getDb() {
-  if (globalThis.kamarkuDatabase) return globalThis.kamarkuDatabase;
+  if (globalThis.kamarkuDatabase) {
+    migrateBookingColumns(globalThis.kamarkuDatabase);
+    return globalThis.kamarkuDatabase;
+  }
   const filename = process.env.DATABASE_PATH || path.join(process.cwd(), 'prisma', 'dev.db');
   fs.mkdirSync(path.dirname(filename), { recursive: true });
   const db = new DatabaseSync(filename);
@@ -40,7 +58,7 @@ export function getDb() {
       stock INTEGER NOT NULL CHECK(stock >= 0), image TEXT NOT NULL, amenities TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS bookings (
-      code TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL,
+      code TEXT PRIMARY KEY, name TEXT NOT NULL, phone TEXT, email TEXT NOT NULL,
       room_id TEXT NOT NULL REFERENCES rooms(id), check_in TEXT NOT NULL, check_out TEXT NOT NULL,
       guests INTEGER NOT NULL CHECK(guests > 0), total INTEGER NOT NULL CHECK(total >= 0),
       status TEXT NOT NULL CHECK(status IN ('pending','confirmed','cancelled','completed')),
@@ -76,14 +94,7 @@ export function getDb() {
     );
     CREATE TABLE IF NOT EXISTS app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
   `);
-  const bookingColumns = new Set((db.prepare('PRAGMA table_info(bookings)').all() as { name: string }[]).map((column) => column.name));
-  const migrations: [string, string][] = [
-    ['identity_number_encrypted', 'TEXT'], ['identity_photo_encrypted', 'TEXT'], ['identity_photo_mime', 'TEXT'],
-    ['identity_consent_at', 'TEXT'], ['identity_delete_at', 'TEXT'], ['payment_status', "TEXT NOT NULL DEFAULT 'not_started'"],
-    ['payment_order_id', 'TEXT'], ['payment_token', 'TEXT'], ['payment_url', 'TEXT'], ['payment_expires_at', 'TEXT'],
-    ['paid_at', 'TEXT'], ['cancelled_at', 'TEXT'], ['refund_status', 'TEXT'],
-  ];
-  for (const [column, type] of migrations) if (!bookingColumns.has(column)) db.exec(`ALTER TABLE bookings ADD COLUMN ${column} ${type}`);
+  migrateBookingColumns(db);
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS bookings_payment_order ON bookings(payment_order_id) WHERE payment_order_id IS NOT NULL');
   const expiredIdentityDeleteAt = new Date(Date.parse(`${hotelToday()}T00:00:00Z`) + 30 * 86400000).toISOString().slice(0, 10);
   db.prepare("UPDATE bookings SET status='cancelled',payment_status='expired',cancelled_at=?,identity_delete_at=COALESCE(identity_delete_at,?) WHERE status='pending' AND payment_status='pending' AND payment_expires_at IS NOT NULL AND payment_expires_at<=?").run(new Date().toISOString(), expiredIdentityDeleteAt, new Date().toISOString());
